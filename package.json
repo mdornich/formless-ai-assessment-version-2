@@ -1,0 +1,69 @@
+{
+  "name": "formless-ai-assessment",
+  "version": "0.1.0",
+  "description": "AI-powered conversational assessment platform inspired by Typeform's Formless",
+  "private": true,
+  "workspaces": [
+    "src/frontend",
+    "src/backend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:frontend": "cd src/frontend && npm run dev",
+    "dev:backend": "cd src/backend && npm run dev",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:frontend": "cd src/frontend && npm run build",
+    "build:backend": "cd src/backend && npm run build",
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:frontend": "cd src/frontend && npm run start",
+    "start:backend": "cd src/backend && npm run start",
+    "lint": "npm run lint:frontend && npm run lint:backend",
+    "lint:frontend": "cd src/frontend && npm run lint",
+    "lint:backend": "cd src/backend && npm run lint",
+    "test": "npm run test:backend",
+    "test:backend": "cd src/backend && npm run test",
+    "install:all": "npm install && cd src/frontend && npm install && cd ../backend && npm install",
+    "clean": "rm -rf node_modules src/frontend/node_modules src/backend/node_modules src/frontend/.next src/backend/dist"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^15.0.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/frontend/**/*.{js,jsx,ts,tsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "src/backend/**/*.{js,ts}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
+  },
+  "keywords": [
+    "ai",
+    "assessment",
+    "conversational-ai",
+    "llm",
+    "typescript",
+    "react",
+    "nextjs",
+    "express",
+    "supabase"
+  ],
+  "author": "Mitch Dornich",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mitchdornich/formless-ai-assessment.git"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}
