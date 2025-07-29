@@ -3,9 +3,9 @@
 ## Section 1: Attitude & Mindset
 
 **Q1:** When you consider the impact of Generative AI on your industry and your specific role, which statement **most accurately describes your primary viewpoint**? (Single Choice)
-- A) My primary focus is on the potential risks and disruptions...
-- B) I'm curious and recognize its growing importance, but I am still exploring its practical relevance...
-- C) I see it as a powerful tool for enhancing personal productivity and driving operational efficiency...
+- A) My primary focus is on the potential risks and disruptions, such as ethical concerns, job displacement, or misinformation.
+- B) I'm curious and recognize its growing importance, but I am still exploring its practical relevance and how it might create value for me and my team.
+- C) I see it as a powerful tool for enhancing personal productivity and driving operational efficiency within our current workflows.
 - D) I view it as a foundational technology that is essential for future innovation, long-term strategy, and maintaining a competitive advantage.
 
 **Q2:** The 'Technology Adoption Lifecycle' describes how different people adopt new innovations at different rates. When it comes to integrating major new technologies like AI into your business practices, which of these profiles **best describes your typical approach**? (Single Choice)
@@ -17,7 +17,7 @@
 
 ## Section 2: Conceptual Understanding
 
-**Q3:** Based on your current understanding, which of the following tasks are **well-suited** for today's readily available Generative AI tools? (Select all that apply)
+**Q3:** Based on your current understanding of AI, which of the following tasks are **well-suited** for today's readily available Generative AI tools (like ChatGPT, Gemini, Copilot, etc.)? (Select all that apply)
 - A) Summarizing a long document or meeting transcript to identify key points.
 - B) Brainstorming a list of creative ideas for a new marketing campaign.
 - C) Providing a definitive and guaranteed-accurate legal or financial compliance opinion.
@@ -47,7 +47,8 @@
 - D) Rarely (A few times a year)
 - E) Never
 
-**Q7:** When you do use Generative AI for your **professional work**, which one of the following best describes your primary mode of interaction? (Single Choice)
+**Q7:** W- When you do use Generative AI for your **professional work**, which one of the following best describes your primary mode of interaction?"
+    *(Please select the one that represents your most common sophisticated use case. If you do not use AI for work, please select the last option.)*
 - A) As a Search Engine or Encyclopedia: I use it to find answers to specific factual questions or get quick explanations of concepts.
 - B) As a Creative Assistant: I use it for "blank page" problems, like brainstorming lists of ideas or writing a first draft of a document.
 - C) As an Analytical Partner: I use it to synthesize complex information, identify key themes in text, or have it critique and improve my own work.
