@@ -1,5 +1,5 @@
 import { geminiService, ConversationMessage, AssessmentResponse } from './gemini';
-import { supabaseService, Assessment } from './supabase';
+import { supabaseService, Conversation, Message } from './supabase';
 import { logger } from '../utils/logger';
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -76,8 +76,11 @@ When complete:
 
   async startConversation(assessmentId: string, userId?: string): Promise<AssessmentResponse> {
     try {
+      logger.info('Starting conversation for assessment:', { assessmentId, userId });
+      
       // Get a starter question
       const starterQuestion = await supabaseService.getRandomStarterQuestion();
+      logger.info('Got starter question:', { starterQuestion });
       
       // Initialize conversation context
       const context: ConversationContext = {
@@ -114,7 +117,7 @@ When complete:
       };
     } catch (error) {
       logger.error('Error starting conversation:', error);
-      throw new Error('Failed to start conversation');
+      throw new Error(`Failed to start conversation: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -139,8 +142,20 @@ When complete:
       await supabaseService.addConversationMessage(assessmentId, userMessage);
 
       // Get updated conversation history
-      const updatedAssessment = await supabaseService.getAssessment(assessmentId);
-      const conversationHistory = updatedAssessment!.conversation_data;
+      const conversation = await supabaseService.getConversation(assessmentId);
+      if (!conversation) {
+        throw new Error('Conversation not found');
+      }
+      
+      // Get all messages for this conversation
+      const messages = await supabaseService.getMessages(assessmentId);
+      
+      // Convert messages to ConversationMessage format
+      const conversationHistory: ConversationMessage[] = messages.map(msg => ({
+        role: msg.sender === 'user' ? 'user' : 'model',
+        content: msg.message_text,
+        timestamp: msg.created_at
+      }));
 
       // Analyze user input for competency indicators
       const competencyIndicators = this.analyzeCompetencyIndicators(userInput, conversationHistory);
@@ -284,15 +299,25 @@ When complete:
 
   async getConversationContext(assessmentId: string): Promise<ConversationContext | null> {
     try {
-      const assessment = await supabaseService.getAssessment(assessmentId);
-      if (!assessment) {
+      const conversation = await supabaseService.getConversation(assessmentId);
+      if (!conversation) {
         return null;
       }
 
+      // Get all messages for this conversation
+      const messages = await supabaseService.getMessages(assessmentId);
+      
+      // Convert messages to ConversationMessage format
+      const conversationHistory: ConversationMessage[] = messages.map(msg => ({
+        role: msg.sender === 'user' ? 'user' : 'model',
+        content: msg.message_text,
+        timestamp: msg.created_at
+      }));
+
       // Analyze the conversation for competency indicators
-      const latestMessage = assessment.conversation_data[assessment.conversation_data.length - 1];
+      const latestMessage = conversationHistory[conversationHistory.length - 1];
       const competencyIndicators = latestMessage && latestMessage.role === 'user' 
-        ? this.analyzeCompetencyIndicators(latestMessage.content, assessment.conversation_data)
+        ? this.analyzeCompetencyIndicators(latestMessage.content, conversationHistory)
         : {
             mindsetSignals: [],
             understandingSignals: [],
@@ -303,10 +328,10 @@ When complete:
 
       return {
         assessmentId,
-        userId: assessment.user_id,
-        conversationHistory: assessment.conversation_data,
+        userId: conversation.user_id,
+        conversationHistory,
         competencyIndicators,
-        currentLevel: assessment.competency_level
+        currentLevel: undefined // Will be determined later
       };
     } catch (error) {
       logger.error('Error getting conversation context:', error);

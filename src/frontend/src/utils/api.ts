@@ -43,7 +43,19 @@ export const assessmentApi = {
     if (!response.data.success) {
       throw new Error(response.data.message || 'Failed to get assessment')
     }
-    return response.data.data
+    const backendAssessment = response.data.data
+    
+    // Transform backend assessment format to frontend Assessment format
+    return {
+      id: backendAssessment.id,
+      status: backendAssessment.status === 'active' ? 'in_progress' : 
+              backendAssessment.status === 'completed' ? 'completed' : 'abandoned',
+      competency_level: backendAssessment.competency_level,
+      competency_label: backendAssessment.competency_label,
+      created_at: backendAssessment.created_at,
+      completed_at: backendAssessment.completed_at,
+      conversation_length: backendAssessment.conversation_length
+    }
   },
 
   // Get conversation history for an assessment
@@ -52,7 +64,16 @@ export const assessmentApi = {
     if (!response.data.success) {
       throw new Error(response.data.message || 'Failed to get messages')
     }
-    return response.data.data.conversationHistory || []
+    const backendMessages = response.data.data.conversationHistory || []
+    
+    // Transform backend message format to frontend Message format
+    return backendMessages.map((msg: any) => ({
+      id: msg.id,
+      content: msg.message_text,
+      role: msg.sender === 'assistant' ? 'agent' : 'user',
+      timestamp: msg.created_at,
+      assessmentId: msg.conversation_id
+    }))
   },
 
   // Send a message

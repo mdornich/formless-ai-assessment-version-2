@@ -1,9 +1,26 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
 import { MessageCircle, Brain, CheckCircle } from 'lucide-react'
+import { assessmentApi } from '@/utils/api'
+import toast from 'react-hot-toast'
 
 const HomePage: React.FC = () => {
+  const [isCreatingDemo, setIsCreatingDemo] = useState(false)
+
+  const handleTryDemo = async () => {
+    setIsCreatingDemo(true)
+    try {
+      const { assessmentId } = await assessmentApi.startAssessment('business_owner_competency')
+      window.location.href = `/assessment/${assessmentId}`
+    } catch (error) {
+      console.error('Failed to create demo assessment:', error)
+      toast.error('Failed to start demo assessment. Please try again.')
+    } finally {
+      setIsCreatingDemo(false)
+    }
+  }
+
   return (
     <>
       <Head>
@@ -59,12 +76,13 @@ const HomePage: React.FC = () => {
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  href="/assessment/demo"
-                  className="px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium"
+                <button
+                  onClick={handleTryDemo}
+                  disabled={isCreatingDemo}
+                  className="px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Try Demo Assessment
-                </Link>
+                  {isCreatingDemo ? 'Creating Assessment...' : 'Try Demo Assessment'}
+                </button>
                 <button
                   className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
                   onClick={() => {

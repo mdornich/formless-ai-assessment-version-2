@@ -1,14 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-<<<<<<< HEAD
-
-export interface ApiError extends Error {
-  statusCode?: number;
-  status?: string;
-}
-
-export const errorHandler = (
-  err: ApiError,
-=======
 import { logger } from '../utils/logger';
 
 export interface AppError extends Error {
@@ -18,34 +8,10 @@ export interface AppError extends Error {
 
 export const errorHandler = (
   error: AppError,
->>>>>>> origin/main
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-<<<<<<< HEAD
-  let error = { ...err };
-  error.message = err.message;
-
-  // Log error
-  console.error(err);
-
-  // Default error
-  if (!error.statusCode) {
-    error.statusCode = 500;
-    error.message = 'Internal Server Error';
-  }
-
-  res.status(error.statusCode || 500).json({
-    success: false,
-    error: error.message,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-  });
-};
-
-export const asyncHandler = (fn: Function) => (req: Request, res: Response, next: NextFunction) =>
-  Promise.resolve(fn(req, res, next)).catch(next);
-=======
   let { statusCode = 500, message } = error;
 
   // Log the error
@@ -87,6 +53,5 @@ export const createError = (message: string, statusCode: number = 500): AppError
 };
 
 export const asyncHandler = (fn: Function) => (req: Request, res: Response, next: NextFunction) => {
-  Promise.resolve(fn(req, res, next)).catch(next);
+  return Promise.resolve(fn(req, res, next)).catch(next);
 };
->>>>>>> origin/main

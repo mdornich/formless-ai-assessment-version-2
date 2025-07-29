@@ -64,7 +64,7 @@ router.post('/generate',
     try {
       const report = await reportGenerationService.generateReport(reportRequest);
       
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         data: {
           report: report,
@@ -73,7 +73,7 @@ router.post('/generate',
       });
     } catch (error) {
       console.error('Report generation error:', error);
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         error: 'Failed to generate assessment report',
         message: error instanceof Error ? error.message : 'Unknown error'
@@ -107,13 +107,13 @@ router.get('/:conversation_id',
         });
       }
 
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         data: { report }
       });
     } catch (error) {
       console.error('Error retrieving report:', error);
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         error: 'Failed to retrieve assessment report',
         message: error instanceof Error ? error.message : 'Unknown error'
@@ -140,13 +140,13 @@ router.get('/:conversation_id/status',
     try {
       const status = await reportGenerationService.getReportStatus(conversation_id);
       
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         data: status
       });
     } catch (error) {
       console.error('Error checking report status:', error);
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         error: 'Failed to check report status',
         message: error instanceof Error ? error.message : 'Unknown error'

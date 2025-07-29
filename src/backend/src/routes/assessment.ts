@@ -21,6 +21,29 @@ const validateRequest = (req: Request, res: Response, next: NextFunction): void 
   next();
 };
 
+// GET /api/assessment/health - MUST be before /:id route
+// Health check for assessment service
+router.get('/health', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const supabaseHealthy = await supabaseService.testConnection();
+    
+    res.json({
+      success: true,
+      data: {
+        service: 'assessment',
+        supabase: supabaseHealthy,
+        timestamp: new Date().toISOString()
+      }
+    });
+  } catch (error) {
+    logger.error('Assessment health check failed:', error);
+    res.status(503).json({
+      success: false,
+      message: 'Service unhealthy'
+    });
+  }
+});
+
 // POST /api/assessment/start
 // Start a new assessment
 router.post('/start',
@@ -42,45 +65,39 @@ router.post('/start',
         assessment_type
       } = req.body;
 
-      // Create new assessment
-      const assessment = await supabaseService.createAssessment({
-        id: uuidv4(),
-        user_name,
-        user_email,
-        user_company,
-        user_role,
+      logger.info('Starting assessment with type:', { assessment_type });
+
+      // Create new conversation (assessment session)
+      const conversationId = uuidv4();
+      logger.info('Creating conversation with ID:', { conversationId });
+      
+      const conversation = await supabaseService.createConversation({
+        id: conversationId,
         assessment_type,
-        status: 'in_progress',
-        conversation_data: [],
-        metadata: {
-          started_at: new Date().toISOString(),
-          user_agent: req.headers['user-agent'],
-          ip_address: req.ip
-        }
+        status: 'active'
       });
 
       // Start the conversation
-      const initialResponse = await conversationEngine.startConversation(assessment.id);
+      const initialResponse = await conversationEngine.startConversation(conversation.id);
 
       // Emit to socket if available
       const io = req.app.get('io');
       if (io) {
-        io.to(assessment.id).emit('assessment_started', {
-          assessmentId: assessment.id,
+        io.to(conversation.id).emit('assessment_started', {
+          assessmentId: conversation.id,
           firstQuestion: initialResponse.next_question
         });
       }
 
       logger.info('Assessment started', { 
-        assessmentId: assessment.id,
-        assessmentType: assessment_type,
-        userEmail: user_email 
+        conversationId: conversation.id,
+        assessmentType: assessment_type
       });
 
       res.status(201).json({
         success: true,
         data: {
-          assessmentId: assessment.id,
+          assessmentId: conversation.id,
           firstQuestion: initialResponse.next_question,
           status: 'started'
         }
@@ -89,7 +106,8 @@ router.post('/start',
       logger.error('Error starting assessment:', error);
       res.status(500).json({
         success: false,
-        message: 'Failed to start assessment'
+        message: 'Failed to start assessment',
+        error: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.message : String(error)) : undefined
       });
     }
   }
@@ -108,8 +126,8 @@ router.get('/:id',
         return;
       }
 
-      const assessment = await supabaseService.getAssessment(id);
-      if (!assessment) {
+      const conversation = await supabaseService.getConversation(id);
+      if (!conversation) {
         res.status(404).json({
           success: false,
           message: 'Assessment not found'
@@ -117,15 +135,17 @@ router.get('/:id',
         return;
       }
 
-      // Remove sensitive conversation data for privacy
+      // Get message count for the conversation
+      const messages = await supabaseService.getMessages(id);
+      
+      // Return conversation info as assessment data
       const publicAssessment = {
-        id: assessment.id,
-        status: assessment.status,
-        competency_level: assessment.competency_level,
-        competency_label: assessment.competency_label,
-        created_at: assessment.created_at,
-        completed_at: assessment.completed_at,
-        conversation_length: assessment.conversation_data.length
+        id: conversation.id,
+        status: conversation.status,
+        assessment_type: conversation.assessment_type,
+        created_at: conversation.created_at,
+        updated_at: conversation.updated_at,
+        conversation_length: messages.length
       };
 
       res.json({
@@ -155,8 +175,8 @@ router.get('/:id/conversation',
         return;
       }
 
-      const context = await conversationEngine.getConversationContext(id);
-      if (!context) {
+      const conversation = await supabaseService.getConversation(id);
+      if (!conversation) {
         res.status(404).json({
           success: false,
           message: 'Assessment not found'
@@ -164,13 +184,15 @@ router.get('/:id/conversation',
         return;
       }
 
+      const messages = await supabaseService.getMessages(id);
+
       res.json({
         success: true,
         data: {
-          assessmentId: context.assessmentId,
-          conversationHistory: context.conversationHistory,
-          competencyIndicators: context.competencyIndicators,
-          currentLevel: context.currentLevel
+          assessmentId: conversation.id,
+          conversationHistory: messages,
+          status: conversation.status,
+          assessment_type: conversation.assessment_type
         }
       });
     } catch (error) {
@@ -196,8 +218,8 @@ router.post('/:id/abandon',
         return;
       }
 
-      const assessment = await supabaseService.getAssessment(id);
-      if (!assessment) {
+      const conversation = await supabaseService.getConversation(id);
+      if (!conversation) {
         res.status(404).json({
           success: false,
           message: 'Assessment not found'
@@ -205,7 +227,7 @@ router.post('/:id/abandon',
         return;
       }
 
-      if (assessment.status === 'completed') {
+      if (conversation.status === 'completed') {
         res.status(400).json({
           success: false,
           message: 'Cannot abandon completed assessment'
@@ -213,12 +235,8 @@ router.post('/:id/abandon',
         return;
       }
 
-      await supabaseService.updateAssessment(id, {
-        status: 'abandoned',
-        metadata: {
-          ...assessment.metadata,
-          abandoned_at: new Date().toISOString()
-        }
+      await supabaseService.updateConversation(id, {
+        status: 'abandoned'
       });
 
       // Emit to socket
@@ -242,28 +260,5 @@ router.post('/:id/abandon',
     }
   }
 );
-
-// GET /api/assessment/health
-// Health check for assessment service
-router.get('/health', async (req: Request, res: Response): Promise<void> => {
-  try {
-    const supabaseHealthy = await supabaseService.testConnection();
-    
-    res.json({
-      success: true,
-      data: {
-        service: 'assessment',
-        supabase: supabaseHealthy,
-        timestamp: new Date().toISOString()
-      }
-    });
-  } catch (error) {
-    logger.error('Assessment health check failed:', error);
-    res.status(503).json({
-      success: false,
-      message: 'Service unhealthy'
-    });
-  }
-});
 
 export default router;
