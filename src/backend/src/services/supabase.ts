@@ -212,7 +212,11 @@ class SupabaseService {
       }
 
       const randomIndex = Math.floor(Math.random() * questions.length);
-      return questions[randomIndex];
+      const selectedQuestion = questions[randomIndex];
+      if (!selectedQuestion) {
+        throw new Error('No starter question found');
+      }
+      return selectedQuestion;
     } catch (error) {
       logger.error('Error getting random starter question:', error);
       // Return fallback question

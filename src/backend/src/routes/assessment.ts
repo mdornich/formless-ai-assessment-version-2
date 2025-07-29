@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { body, param, validationResult } from 'express-validator';
 import { v4 as uuidv4 } from 'uuid';
 import { supabaseService } from '../services/supabase';
@@ -8,14 +8,15 @@ import { logger } from '../utils/logger';
 const router = Router();
 
 // Validation middleware
-const validateRequest = (req: Request, res: Response, next: any) => {
+const validateRequest = (req: Request, res: Response, next: NextFunction): void => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({
+    res.status(400).json({
       success: false,
       message: 'Validation failed',
       errors: errors.array()
     });
+    return;
   }
   next();
 };
@@ -31,7 +32,7 @@ router.post('/start',
     body('assessment_type').isIn(['business_owner_competency', 'business_ai_readiness'])
   ],
   validateRequest,
-  async (req: Request, res: Response) => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
       const {
         user_name,
@@ -99,16 +100,21 @@ router.post('/start',
 router.get('/:id',
   [param('id').isUUID()],
   validateRequest,
-  async (req: Request, res: Response) => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
+      if (!id) {
+        res.status(400).json({ success: false, message: 'Assessment ID is required' });
+        return;
+      }
 
       const assessment = await supabaseService.getAssessment(id);
       if (!assessment) {
-        return res.status(404).json({
+        res.status(404).json({
           success: false,
           message: 'Assessment not found'
         });
+        return;
       }
 
       // Remove sensitive conversation data for privacy
@@ -141,16 +147,21 @@ router.get('/:id',
 router.get('/:id/conversation',
   [param('id').isUUID()],
   validateRequest,
-  async (req: Request, res: Response) => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
+      if (!id) {
+        res.status(400).json({ success: false, message: 'Assessment ID is required' });
+        return;
+      }
 
       const context = await conversationEngine.getConversationContext(id);
       if (!context) {
-        return res.status(404).json({
+        res.status(404).json({
           success: false,
           message: 'Assessment not found'
         });
+        return;
       }
 
       res.json({
@@ -177,23 +188,29 @@ router.get('/:id/conversation',
 router.post('/:id/abandon',
   [param('id').isUUID()],
   validateRequest,
-  async (req: Request, res: Response) => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
+      if (!id) {
+        res.status(400).json({ success: false, message: 'Assessment ID is required' });
+        return;
+      }
 
       const assessment = await supabaseService.getAssessment(id);
       if (!assessment) {
-        return res.status(404).json({
+        res.status(404).json({
           success: false,
           message: 'Assessment not found'
         });
+        return;
       }
 
       if (assessment.status === 'completed') {
-        return res.status(400).json({
+        res.status(400).json({
           success: false,
           message: 'Cannot abandon completed assessment'
         });
+        return;
       }
 
       await supabaseService.updateAssessment(id, {
@@ -228,7 +245,7 @@ router.post('/:id/abandon',
 
 // GET /api/assessment/health
 // Health check for assessment service
-router.get('/health', async (req: Request, res: Response) => {
+router.get('/health', async (req: Request, res: Response): Promise<void> => {
   try {
     const supabaseHealthy = await supabaseService.testConnection();
     

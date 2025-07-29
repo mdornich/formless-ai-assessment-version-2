@@ -21,7 +21,7 @@ export interface CompetencyIndicators {
 }
 
 class ConversationEngine {
-  private systemPrompt: string;
+  private systemPrompt: string = '';
 
   constructor() {
     this.loadSystemPrompt();
