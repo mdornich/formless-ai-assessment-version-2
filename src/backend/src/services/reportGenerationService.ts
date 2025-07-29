@@ -265,7 +265,7 @@ Create a professional Business Owner AI Competency Assessment Report that is per
   private extractSection(markdown: string, sectionTitle: string): string {
     const regex = new RegExp(`##?\\s*${sectionTitle}[^\\n]*\\n([\\s\\S]*?)(?=\\n##|$)`, 'i');
     const match = markdown.match(regex);
-    return match ? match[1].trim() : '';
+    return match && match[1] ? match[1].trim() : '';
   }
 
   private extractListItems(markdown: string, sectionTitle: string): string[] {

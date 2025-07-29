@@ -1,9 +1,11 @@
 import dotenv from 'dotenv';
+import path from 'path';
 import { ReportGenerationService } from '../services/reportGenerationService';
 import { createTestConversation, createTestMessages, testUserContext } from './testData';
 import supabase from '../config/supabase';
 
-dotenv.config();
+// Load environment variables from the backend directory
+dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 async function testReportGeneration() {
   console.log('🧪 Testing Assessment Report Generation System...\n');
