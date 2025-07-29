@@ -6,6 +6,10 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
+<<<<<<< HEAD
+=======
+    "moduleResolution": "node",
+>>>>>>> origin/main
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -24,11 +28,15 @@
     "noImplicitOverride": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
+<<<<<<< HEAD
     "emitDecoratorMetadata": true,
     "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"]
     }
+=======
+    "emitDecoratorMetadata": true
+>>>>>>> origin/main
   },
   "include": [
     "src/**/*"
