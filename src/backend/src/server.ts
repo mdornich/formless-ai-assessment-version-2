@@ -1,8 +1,11 @@
+// Load environment variables FIRST, before any other imports
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import dotenv from 'dotenv';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import rateLimit from 'express-rate-limit';
@@ -11,9 +14,6 @@ import { errorHandler } from './middleware/errorHandler';
 import { logger } from './utils/logger';
 import assessmentRoutes from './routes/assessment';
 import conversationRoutes from './routes/conversation';
-
-// Load environment variables
-dotenv.config();
 
 const app = express();
 const server = createServer(app);

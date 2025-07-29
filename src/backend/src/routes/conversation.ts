@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { body, param, validationResult } from 'express-validator';
 import { conversationEngine } from '../services/conversationEngine';
 import { supabaseService } from '../services/supabase';
@@ -7,14 +7,15 @@ import { logger } from '../utils/logger';
 const router = Router();
 
 // Validation middleware
-const validateRequest = (req: Request, res: Response, next: any) => {
+const validateRequest = (req: Request, res: Response, next: NextFunction): void => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({
+    res.status(400).json({
       success: false,
       message: 'Validation failed',
       errors: errors.array()
     });
+    return;
   }
   next();
 };
@@ -27,25 +28,32 @@ router.post('/:assessmentId/message',
     body('message').isString().trim().isLength({ min: 1, max: 2000 })
   ],
   validateRequest,
-  async (req: Request, res: Response) => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
       const { assessmentId } = req.params;
       const { message } = req.body;
 
+      if (!assessmentId) {
+        res.status(400).json({ success: false, message: 'Assessment ID is required' });
+        return;
+      }
+
       // Check if assessment exists and is in progress
       const assessment = await supabaseService.getAssessment(assessmentId);
       if (!assessment) {
-        return res.status(404).json({
+        res.status(404).json({
           success: false,
           message: 'Assessment not found'
         });
+        return;
       }
 
       if (assessment.status !== 'in_progress') {
-        return res.status(400).json({
+        res.status(400).json({
           success: false,
           message: 'Assessment is not in progress'
         });
+        return;
       }
 
       // Continue the conversation
@@ -98,16 +106,22 @@ router.post('/:assessmentId/message',
 router.get('/:assessmentId/context',
   [param('assessmentId').isUUID()],
   validateRequest,
-  async (req: Request, res: Response) => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
       const { assessmentId } = req.params;
 
+      if (!assessmentId) {
+        res.status(400).json({ success: false, message: 'Assessment ID is required' });
+        return;
+      }
+
       const context = await conversationEngine.getConversationContext(assessmentId);
       if (!context) {
-        return res.status(404).json({
+        res.status(404).json({
           success: false,
           message: 'Assessment not found'
         });
+        return;
       }
 
       res.json({
@@ -135,23 +149,30 @@ router.get('/:assessmentId/context',
 router.post('/:assessmentId/restart',
   [param('assessmentId').isUUID()],
   validateRequest,
-  async (req: Request, res: Response) => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
       const { assessmentId } = req.params;
 
+      if (!assessmentId) {
+        res.status(400).json({ success: false, message: 'Assessment ID is required' });
+        return;
+      }
+
       const assessment = await supabaseService.getAssessment(assessmentId);
       if (!assessment) {
-        return res.status(404).json({
+        res.status(404).json({
           success: false,
           message: 'Assessment not found'
         });
+        return;
       }
 
       if (assessment.status === 'completed') {
-        return res.status(400).json({
+        res.status(400).json({
           success: false,
           message: 'Cannot restart completed assessment'
         });
+        return;
       }
 
       // Reset the assessment
@@ -201,7 +222,7 @@ router.post('/:assessmentId/restart',
 
 // GET /api/conversation/starter-questions
 // Get available starter questions (for admin/testing)
-router.get('/starter-questions', async (req: Request, res: Response) => {
+router.get('/starter-questions', async (req: Request, res: Response): Promise<void> => {
   try {
     const questions = await supabaseService.getStarterQuestions();
 
@@ -220,7 +241,7 @@ router.get('/starter-questions', async (req: Request, res: Response) => {
 
 // GET /api/conversation/health
 // Health check for conversation service
-router.get('/health', async (req: Request, res: Response) => {
+router.get('/health', async (req: Request, res: Response): Promise<void> => {
   try {
     const supabaseHealthy = await supabaseService.testConnection();
     const geminiHealthy = await import('../services/gemini').then(m => m.geminiService.testConnection());
