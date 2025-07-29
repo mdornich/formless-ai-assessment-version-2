@@ -39,7 +39,7 @@ router.post('/:assessmentId/message',
       }
 
       // Check if assessment exists and is in progress
-      const assessment = await supabaseService.getAssessment(assessmentId);
+      const assessment = await supabaseService.getConversation(assessmentId);
       if (!assessment) {
         res.status(404).json({
           success: false,
@@ -48,7 +48,7 @@ router.post('/:assessmentId/message',
         return;
       }
 
-      if (assessment.status !== 'in_progress') {
+      if (assessment.status !== 'active') {
         res.status(400).json({
           success: false,
           message: 'Assessment is not in progress'
@@ -158,7 +158,7 @@ router.post('/:assessmentId/restart',
         return;
       }
 
-      const assessment = await supabaseService.getAssessment(assessmentId);
+      const assessment = await supabaseService.getConversation(assessmentId);
       if (!assessment) {
         res.status(404).json({
           success: false,
@@ -175,19 +175,15 @@ router.post('/:assessmentId/restart',
         return;
       }
 
-      // Reset the assessment
-      await supabaseService.updateAssessment(assessmentId, {
-        status: 'in_progress',
-        conversation_data: [],
-        competency_level: undefined,
-        competency_label: undefined,
-        final_summary: undefined,
-        completed_at: undefined,
-        metadata: {
-          ...assessment.metadata,
-          restarted_at: new Date().toISOString()
-        }
+      // Reset the conversation
+      await supabaseService.updateConversation(assessmentId, {
+        status: 'active',
+        current_step: 0,
+        updated_at: new Date()
       });
+      
+      // Clear existing messages (optional - you might want to keep history)
+      // This would require implementing a deleteMessages method
 
       // Start a new conversation
       const initialResponse = await conversationEngine.startConversation(assessmentId, assessment.user_id);
