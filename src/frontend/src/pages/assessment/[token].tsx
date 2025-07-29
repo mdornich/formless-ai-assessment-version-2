@@ -42,9 +42,9 @@ const AssessmentPage: React.FC = () => {
     setLocalMessages(data.messages)
   }, [])
 
-  const handleAssessmentComplete = useCallback((reportId: string) => {
+  const handleAssessmentComplete = useCallback((assessmentId: string) => {
     if (socketAssessment) {
-      setSocketAssessment(prev => prev ? { ...prev, status: 'completed', reportId } : null)
+      setSocketAssessment(prev => prev ? { ...prev, status: 'completed' } : null)
     }
     toast.success('Assessment completed! Report generated.')
   }, [socketAssessment])

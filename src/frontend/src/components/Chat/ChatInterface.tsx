@@ -21,7 +21,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 }) => {
   const [showTimestamps, setShowTimestamps] = useState(false)
 
-  const isDisabled = !isConnected || assessment.status !== 'active'
+  const isDisabled = !isConnected || assessment.status !== 'in_progress'
 
   return (
     <div className="flex flex-col h-screen max-h-screen bg-gray-50">
@@ -71,7 +71,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         placeholder={
           !isConnected 
             ? 'Connecting...' 
-            : assessment.status !== 'active'
+            : assessment.status !== 'in_progress'
             ? 'Assessment completed'
             : 'Type your message...'
         }
@@ -86,7 +86,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         </div>
       )}
       
-      {assessment.status === 'expired' && (
+      {assessment.status === 'abandoned' && (
         <div className="bg-red-50 border-t border-red-200 px-4 py-2">
           <p className="text-sm text-red-700 text-center">
             This assessment session has expired.

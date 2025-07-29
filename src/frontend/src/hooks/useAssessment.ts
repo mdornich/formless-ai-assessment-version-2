@@ -55,7 +55,12 @@ export const useAssessment = ({ token }: UseAssessmentProps): UseAssessmentRetur
     mutationFn: (content: string) => 
       assessmentApi.sendMessage({ content, token }),
     onSuccess: (response) => {
-      const newMessage = response.message
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        content: response.message,
+        role: 'agent',
+        timestamp: response.timestamp || new Date().toISOString(),
+      }
       setMessages(prev => [...prev, newMessage])
       
       if (response.isComplete) {
@@ -86,7 +91,7 @@ export const useAssessment = ({ token }: UseAssessmentProps): UseAssessmentRetur
   }, [])
 
   const sendMessage = useCallback(async (content: string) => {
-    if (!assessment || assessment.status !== 'active') {
+    if (!assessment || assessment.status !== 'in_progress') {
       toast.error(ERROR_MESSAGES.ASSESSMENT_EXPIRED)
       return
     }
@@ -96,7 +101,7 @@ export const useAssessment = ({ token }: UseAssessmentProps): UseAssessmentRetur
       id: `temp-${Date.now()}`,
       content,
       role: 'user',
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
       assessmentId: assessment.id,
     }
     

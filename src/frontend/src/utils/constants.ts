@@ -1,20 +1,21 @@
 export const API_CONFIG = {
-  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000',
-  SOCKET_URL: process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000',
+  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001',
+  SOCKET_URL: process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5001',
   TIMEOUT: 30000,
 }
 
 export const SOCKET_EVENTS = {
   // Client to Server
-  JOIN_ASSESSMENT: 'join-assessment',
-  SEND_MESSAGE: 'send-message',
+  JOIN_ASSESSMENT: 'join_assessment',
+  SEND_MESSAGE: 'send_message', 
   TYPING: 'typing',
 
-  // Server to Client
-  ASSESSMENT_JOINED: 'assessment-joined',
-  NEW_MESSAGE: 'new-message',
-  AGENT_TYPING: 'agent-typing',
-  ASSESSMENT_COMPLETE: 'assessment-complete',
+  // Server to Client (based on backend routes)
+  ASSESSMENT_STARTED: 'assessment_started',
+  MESSAGE_RECEIVED: 'message_received',
+  ASSESSMENT_COMPLETED: 'assessment_completed',
+  ASSESSMENT_ABANDONED: 'assessment_abandoned',
+  CONVERSATION_RESTARTED: 'conversation_restarted',
   ERROR: 'error',
 } as const
 

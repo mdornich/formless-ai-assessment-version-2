@@ -65,37 +65,38 @@ export const useSocket = ({
     })
 
     // Assessment events
-    socket.on(SOCKET_EVENTS.ASSESSMENT_JOINED, (data: { assessment: Assessment; messages: Message[] }) => {
-      console.log('Assessment joined:', data)
-      onAssessmentJoined?.(data)
+    socket.on(SOCKET_EVENTS.ASSESSMENT_STARTED, (data: { assessmentId: string; firstQuestion: string }) => {
+      console.log('Assessment started:', data)
+      // Handle assessment start if needed
     })
 
-    socket.on(SOCKET_EVENTS.NEW_MESSAGE, (message: Message) => {
-      console.log('New message received:', message)
+    socket.on(SOCKET_EVENTS.MESSAGE_RECEIVED, (data: { assessmentId: string; userMessage: string; aiResponse: any; timestamp: string }) => {
+      console.log('Message received:', data)
+      const message: Message = {
+        id: Date.now().toString(),
+        content: data.aiResponse.next_question || '',
+        role: 'agent',
+        timestamp: data.timestamp,
+      }
       onNewMessage?.(message)
       setIsTyping(false)
     })
 
-    socket.on(SOCKET_EVENTS.AGENT_TYPING, () => {
-      console.log('Agent is typing')
-      setIsTyping(true)
-      
-      // Clear existing timeout
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current)
-      }
-      
-      // Set new timeout to stop typing indicator
-      typingTimeoutRef.current = setTimeout(() => {
-        setIsTyping(false)
-      }, UI_CONFIG.TYPING_TIMEOUT)
+    socket.on(SOCKET_EVENTS.ASSESSMENT_COMPLETED, (data: { assessmentId: string; finalSummary?: any }) => {
+      console.log('Assessment completed:', data)
+      setIsTyping(false)
+      onAssessmentComplete?.(data.assessmentId)
+      toast.success('Assessment completed!')
     })
 
-    socket.on(SOCKET_EVENTS.ASSESSMENT_COMPLETE, (reportId: string) => {
-      console.log('Assessment completed:', reportId)
-      setIsTyping(false)
-      onAssessmentComplete?.(reportId)
-      toast.success('Assessment completed!')
+    socket.on(SOCKET_EVENTS.ASSESSMENT_ABANDONED, (data: { assessmentId: string }) => {
+      console.log('Assessment abandoned:', data)
+      toast('Assessment has been abandoned')
+    })
+
+    socket.on(SOCKET_EVENTS.CONVERSATION_RESTARTED, (data: { assessmentId: string; firstQuestion: string }) => {
+      console.log('Conversation restarted:', data)
+      toast('Conversation has been restarted')
     })
 
     socket.on(SOCKET_EVENTS.ERROR, (error: ApiError) => {
@@ -151,10 +152,11 @@ export const useSocket = ({
         socketRef.current.off('connect')
         socketRef.current.off('disconnect')
         socketRef.current.off('connect_error')
-        socketRef.current.off(SOCKET_EVENTS.ASSESSMENT_JOINED)
-        socketRef.current.off(SOCKET_EVENTS.NEW_MESSAGE)
-        socketRef.current.off(SOCKET_EVENTS.AGENT_TYPING)
-        socketRef.current.off(SOCKET_EVENTS.ASSESSMENT_COMPLETE)
+        socketRef.current.off(SOCKET_EVENTS.ASSESSMENT_STARTED)
+        socketRef.current.off(SOCKET_EVENTS.MESSAGE_RECEIVED)
+        socketRef.current.off(SOCKET_EVENTS.ASSESSMENT_COMPLETED)
+        socketRef.current.off(SOCKET_EVENTS.ASSESSMENT_ABANDONED)
+        socketRef.current.off(SOCKET_EVENTS.CONVERSATION_RESTARTED)
         socketRef.current.off(SOCKET_EVENTS.ERROR)
         socketRef.current.disconnect()
         socketRef.current = null

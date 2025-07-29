@@ -2,19 +2,18 @@ export interface Message {
   id: string
   content: string
   role: 'user' | 'agent'
-  timestamp: Date
-  assessmentId: string
+  timestamp: string | Date
+  assessmentId?: string
 }
 
 export interface Assessment {
   id: string
-  token: string
-  status: 'active' | 'completed' | 'expired'
-  userId?: string
-  createdAt: Date
-  updatedAt: Date
-  completedAt?: Date
-  reportId?: string
+  status: 'in_progress' | 'completed' | 'abandoned'
+  competency_level?: string
+  competency_label?: string
+  created_at: string
+  completed_at?: string
+  conversation_length?: number
 }
 
 export interface AssessmentSession {
@@ -31,13 +30,14 @@ export interface ApiError {
 }
 
 export interface SocketEvents {
-  'join-assessment': (token: string) => void
-  'send-message': (message: string) => void
+  'join_assessment': (assessmentId: string) => void
+  'send_message': (message: string) => void
   'typing': () => void
-  'assessment-joined': (data: { assessment: Assessment; messages: Message[] }) => void
-  'new-message': (message: Message) => void
-  'agent-typing': () => void
-  'assessment-complete': (reportId: string) => void
+  'assessment_started': (data: { assessmentId: string; firstQuestion: string }) => void
+  'message_received': (data: { assessmentId: string; userMessage: string; aiResponse: any; timestamp: string }) => void
+  'assessment_completed': (data: { assessmentId: string; finalSummary?: any }) => void
+  'assessment_abandoned': (data: { assessmentId: string }) => void
+  'conversation_restarted': (data: { assessmentId: string; firstQuestion: string }) => void
   'error': (error: ApiError) => void
 }
 
@@ -47,6 +47,7 @@ export interface SendMessageRequest {
 }
 
 export interface SendMessageResponse {
-  message: Message
+  message: string
   isComplete?: boolean
+  timestamp?: string
 }

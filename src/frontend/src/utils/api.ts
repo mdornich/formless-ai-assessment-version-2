@@ -37,36 +37,79 @@ api.interceptors.response.use(
 )
 
 export const assessmentApi = {
-  // Get assessment by token
-  getAssessment: async (token: string): Promise<Assessment> => {
-    const response = await api.get<Assessment>(`/assessments/${token}`)
-    return response.data
+  // Get assessment by ID
+  getAssessment: async (assessmentId: string): Promise<Assessment> => {
+    const response = await api.get(`/assessment/${assessmentId}`)
+    if (!response.data.success) {
+      throw new Error(response.data.message || 'Failed to get assessment')
+    }
+    return response.data.data
   },
 
-  // Get messages for an assessment
-  getMessages: async (token: string): Promise<Message[]> => {
-    const response = await api.get<Message[]>(`/assessments/${token}/messages`)
-    return response.data
+  // Get conversation history for an assessment
+  getMessages: async (assessmentId: string): Promise<Message[]> => {
+    const response = await api.get(`/assessment/${assessmentId}/conversation`)
+    if (!response.data.success) {
+      throw new Error(response.data.message || 'Failed to get messages')
+    }
+    return response.data.data.conversationHistory || []
   },
 
   // Send a message
   sendMessage: async (request: SendMessageRequest): Promise<SendMessageResponse> => {
-    const response = await api.post<SendMessageResponse>(
-      `/assessments/${request.token}/messages`,
-      { content: request.content }
+    const response = await api.post(
+      `/conversation/${request.token}/message`,
+      { message: request.content }
     )
-    return response.data
+    if (!response.data.success) {
+      throw new Error(response.data.message || 'Failed to send message')
+    }
+    return {
+      message: response.data.data.response.next_question || '',
+      isComplete: response.data.data.isComplete || false,
+      timestamp: response.data.data.timestamp
+    }
   },
 
-  // Complete assessment
-  completeAssessment: async (token: string): Promise<void> => {
-    await api.post(`/assessments/${token}/complete`)
+  // Start a new assessment
+  startAssessment: async (assessmentType: string = 'business_owner_competency'): Promise<{ assessmentId: string; firstQuestion: string }> => {
+    const response = await api.post('/assessment/start', {
+      assessment_type: assessmentType
+    })
+    if (!response.data.success) {
+      throw new Error(response.data.message || 'Failed to start assessment')
+    }
+    return {
+      assessmentId: response.data.data.assessmentId,
+      firstQuestion: response.data.data.firstQuestion
+    }
   },
 
-  // Get report (if available)
-  getReport: async (token: string): Promise<any> => {
-    const response = await api.get(`/assessments/${token}/report`)
-    return response.data
+  // Abandon assessment
+  abandonAssessment: async (assessmentId: string): Promise<void> => {
+    const response = await api.post(`/assessment/${assessmentId}/abandon`)
+    if (!response.data.success) {
+      throw new Error(response.data.message || 'Failed to abandon assessment')
+    }
+  },
+
+  // Get conversation context
+  getConversationContext: async (assessmentId: string): Promise<any> => {
+    const response = await api.get(`/conversation/${assessmentId}/context`)
+    if (!response.data.success) {
+      throw new Error(response.data.message || 'Failed to get conversation context')
+    }
+    return response.data.data
+  },
+
+  // Health check
+  healthCheck: async (): Promise<boolean> => {
+    try {
+      const response = await api.get('/assessment/health')
+      return response.data.success
+    } catch {
+      return false
+    }
   },
 }
 
