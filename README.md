@@ -1,6 +1,10 @@
-# Formless AI Assessment Platform
+# Formless AI Assessment Platform v2.0
+
+**Complete Rebuild - Simplified Architecture**
 
 An AI-powered conversational assessment platform inspired by Typeform's Formless. Users engage in dynamic conversations that adapt based on their answers, driven by LLMs, with automated generation of personalized reports.
+
+> This is version 2.0 featuring a "dumb frontend, smart backend" architecture where the AI handles all conversation logic.
 
 ## 🎯 Project Overview
 
