@@ -12,21 +12,15 @@ body {
 }
 
 /* Custom component styles using theme variables */
-.chat-container {
+.survey-container {
   background-color: var(--container-background);
   max-width: var(--container-max-width);
   border: 1px solid var(--border-color);
 }
 
-.chat-bubble-user {
-  background-color: var(--user-bubble-background);
-  color: var(--user-bubble-text);
-  border-radius: var(--bubble-border-radius);
-}
-
-.chat-bubble-agent {
-  background-color: var(--agent-bubble-background);
-  color: var(--agent-bubble-text);
+.question-container {
+  background-color: var(--container-background);
+  padding: 2rem;
   border-radius: var(--bubble-border-radius);
 }
 
