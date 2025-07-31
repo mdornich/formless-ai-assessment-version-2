@@ -1,39 +1,15 @@
-// Load environment variables FIRST, before any other imports
-import dotenv from 'dotenv';
-dotenv.config();
-
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import morgan from 'morgan';
-import { createServer } from 'http';
-import { Server } from 'socket.io';
-import rateLimit from 'express-rate-limit';
+import dotenv from 'dotenv';
+import { databaseService } from './services/database';
+import { aiService } from './services/ai';
 
-import { errorHandler } from './middleware/errorHandler';
-import { logger } from './utils/logger';
-import assessmentRoutes from './routes/assessment';
-import conversationRoutes from './routes/conversation';
-import reportRoutes from './controllers/reportController';
+// Load environment variables
+dotenv.config();
 
 const app = express();
-const server = createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
-    methods: ["GET", "POST"],
-    credentials: true
-  }
-});
-
 const PORT = process.env.PORT || 5001;
-
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.'
-});
 
 // Middleware
 app.use(helmet());
@@ -41,49 +17,102 @@ app.use(cors({
   origin: process.env.FRONTEND_URL || "http://localhost:3000",
   credentials: true
 }));
-app.use(morgan('combined', { stream: { write: (message) => logger.info(message.trim()) } }));
 app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
-app.use(limiter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ 
     status: 'healthy', 
     timestamp: new Date().toISOString(),
-    service: 'formless-ai-backend'
+    service: 'formless-ai-backend-v2'
   });
 });
 
-// API Routes
-app.use('/api/assessment', assessmentRoutes);
-app.use('/api/conversation', conversationRoutes);
-app.use('/api/reports', reportRoutes);
+// Single chat endpoint - this is the core of the simplified architecture
+app.post('/api/chat', async (req, res) => {
+  try {
+    const { conversation_id, user_message } = req.body;
 
-// Socket.io connection handling
-io.on('connection', (socket) => {
-  logger.info(`Client connected: ${socket.id}`);
+    // Validate request
+    if (!conversation_id || !user_message) {
+      return res.status(400).json({
+        error: 'conversation_id and user_message are required'
+      });
+    }
 
-  socket.on('join_assessment', (assessmentId: string) => {
-    socket.join(assessmentId);
-    logger.info(`Client ${socket.id} joined assessment: ${assessmentId}`);
-  });
+    // Get conversation from database
+    const conversation = await databaseService.getConversation(conversation_id);
+    if (!conversation) {
+      return res.status(404).json({
+        error: 'Conversation not found'
+      });
+    }
 
-  socket.on('disconnect', () => {
-    logger.info(`Client disconnected: ${socket.id}`);
-  });
+    // Check if conversation is still in progress
+    if (conversation.status !== 'in_progress') {
+      return res.status(400).json({
+        error: 'Conversation is not in progress'
+      });
+    }
+
+    // Add user message to database
+    await databaseService.addMessage(conversation_id, 'user', user_message);
+
+    // Get conversation history
+    const messages = await databaseService.getMessages(conversation_id);
+
+    // Get AI instructions and question bank
+    const instructions = await databaseService.getInstructions('BUSINESS_OWNER_COMPETENCY');
+    if (!instructions) {
+      return res.status(500).json({
+        error: 'AI instructions not found'
+      });
+    }
+
+    // Generate AI response
+    const aiResponse = await aiService.generateResponse(
+      instructions.prompt_text,
+      messages,
+      instructions.question_bank,
+      user_message
+    );
+
+    // Add AI response to database
+    if (aiResponse.next_question) {
+      await databaseService.addMessage(conversation_id, 'system', aiResponse.next_question);
+    } else if (aiResponse.final_summary) {
+      await databaseService.addMessage(conversation_id, 'system', aiResponse.final_summary);
+      // Update conversation status and create assessment
+      await databaseService.updateConversationStatus(conversation_id, 'completed');
+      await databaseService.createAssessment(conversation_id, aiResponse.final_summary);
+    }
+
+    // Return response in exact format specified
+    if (aiResponse.is_complete) {
+      res.json({
+        final_summary: aiResponse.final_summary,
+        is_complete: true
+      });
+    } else {
+      res.json({
+        next_question: aiResponse.next_question,
+        is_complete: false
+      });
+    }
+
+  } catch (error) {
+    console.error('Error in /api/chat:', error);
+    res.status(500).json({
+      error: 'Internal server error'
+    });
+  }
 });
-
-// Store io instance for use in routes
-app.set('io', io);
-
-// Error handling middleware (must be last)
-app.use(errorHandler);
 
 // Start server
-server.listen(PORT, () => {
-  logger.info(`🚀 Server running on port ${PORT}`);
-  logger.info(`📊 Health check available at http://localhost:${PORT}/health`);
+app.listen(PORT, () => {
+  console.log(`🚀 Formless AI Backend v2.0 running on port ${PORT}`);
+  console.log(`📊 Health check available at http://localhost:${PORT}/health`);
+  console.log(`💬 Chat endpoint available at http://localhost:${PORT}/api/chat`);
 });
 
-export { app, io };
+export default app;
