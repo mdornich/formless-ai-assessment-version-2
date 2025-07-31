@@ -1,0 +1,41 @@
+/* Formless AI Assessment Platform v2.0 - Theme System */
+
+:root {
+  /* 🎨 Primary Colors */
+  --primary-color: #4A90E2; /* The main brand color for buttons, links, etc. */
+  --background-color: #F7F9FC; /* The main page background */
+  --container-background: #FFFFFF; /* Background of the chat container */
+  --font-color-primary: #333333; /* Main text color */
+  --font-color-secondary: #777777; /* Lighter text for timestamps, etc. */
+
+  /* 💬 Chat Bubble Colors */
+  --agent-bubble-background: #EAECEF;
+  --agent-bubble-text: #333333;
+  --user-bubble-background: var(--primary-color);
+  --user-bubble-text: #FFFFFF;
+
+  /* ✒️ Typography */
+  --primary-font: 'Inter', sans-serif; /* Specify a primary font family */
+  --base-font-size: 16px;
+
+  /* 📐 Spacing & Borders */
+  --container-max-width: 700px; /* Max width of the chat window */
+  --bubble-border-radius: 18px; /* The roundness of the chat bubbles */
+  --input-border-radius: 12px; /* The roundness of the text input field */
+  --border-color: #DDDDDD;
+}
+
+/* Optional: Add a placeholder for a dark mode theme */
+/*
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary-color: #5A9BFF;
+    --background-color: #121212;
+    --container-background: #1E1E1E;
+    --font-color-primary: #EAEAEA;
+    --font-color-secondary: #AAAAAA;
+    --agent-bubble-background: #333333;
+    --border-color: #444444;
+  }
+}
+*/

@@ -1,6 +1,7 @@
 {
-  "name": "formless-ai-frontend",
-  "version": "0.1.0",
+  "name": "formless-ai-frontend-v2",
+  "version": "2.0.0",
+  "description": "Simplified stateless frontend for AI assessment platform",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -13,19 +14,7 @@
     "next": "^14.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "@supabase/supabase-js": "^2.38.0",
-    "socket.io-client": "^4.7.0",
-    "@tanstack/react-query": "^5.0.0",
-    "axios": "^1.6.0",
-    "date-fns": "^2.30.0",
-    "react-hook-form": "^7.47.0",
-    "@hookform/resolvers": "^3.3.0",
-    "zod": "^3.22.0",
-    "clsx": "^2.0.0",
-    "tailwind-merge": "^2.0.0",
-    "lucide-react": "^0.290.0",
-    "react-hot-toast": "^2.4.0",
-    "framer-motion": "^10.16.0"
+    "axios": "^1.6.0"
   },
   "devDependencies": {
     "typescript": "^5.2.0",
@@ -34,17 +23,8 @@
     "@types/react-dom": "^18.2.0",
     "eslint": "^8.52.0",
     "eslint-config-next": "^14.0.0",
-    "@typescript-eslint/eslint-plugin": "^6.9.0",
-    "@typescript-eslint/parser": "^6.9.0",
     "tailwindcss": "^3.3.0",
     "postcss": "^8.4.0",
-    "autoprefixer": "^10.4.0",
-    "@tailwindcss/forms": "^0.5.0",
-    "@tailwindcss/typography": "^0.5.0",
-    "prettier": "^3.0.0",
-    "prettier-plugin-tailwindcss": "^0.5.0"
-  },
-  "engines": {
-    "node": ">=18.0.0"
+    "autoprefixer": "^10.4.0"
   }
 }
