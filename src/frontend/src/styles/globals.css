@@ -100,3 +100,234 @@ body {
   transform: translateY(-3px);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
 }
+
+/* ==================================================
+   🌟 STAR WARS CINEMATIC ANIMATIONS 🌟
+   ================================================== */
+
+/* Star Field Background */
+.star-field {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  animation: starMove 3s linear infinite;
+}
+
+.star:nth-child(odd) {
+  background: #ffeb3b;
+  animation-duration: 4s;
+}
+
+.star:nth-child(3n) {
+  background: #03a9f4;
+  animation-duration: 2s;
+}
+
+@keyframes starMove {
+  0% {
+    transform: translateY(100vh) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) scale(1);
+    opacity: 0;
+  }
+}
+
+/* Cinematic Container */
+.cinematic-container {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+/* Opening Text - "In a digital universe..." */
+.cinematic-opening {
+  margin-bottom: 2rem;
+  animation: fadeInFromSpace 3s ease-in-out;
+  animation-fill-mode: both;
+}
+
+@keyframes fadeInFromSpace {
+  0% {
+    opacity: 0;
+    transform: translateZ(-1000px) scale(0.1);
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+    transform: translateZ(0) scale(1);
+  }
+}
+
+/* Main Title Zoom Effect */
+.cinematic-title {
+  margin-bottom: 3rem;
+  animation: cinematicZoom 4s ease-out;
+  animation-delay: 2s;
+  animation-fill-mode: both;
+}
+
+@keyframes cinematicZoom {
+  0% {
+    opacity: 0;
+    transform: scale(0.01) rotateX(90deg) rotateY(0deg);
+  }
+  20% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(0.5) rotateX(45deg) rotateY(5deg);
+  }
+  80% {
+    opacity: 0.9;
+    transform: scale(0.9) rotateX(10deg) rotateY(-2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotateX(0deg) rotateY(0deg);
+  }
+}
+
+/* Opening Crawl Container */
+.crawl-container {
+  perspective: 400px;
+  height: 400px;
+  overflow: hidden;
+  margin: 2rem 0;
+  position: relative;
+}
+
+.crawl-text {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  animation: titleCrawl 15s linear;
+  animation-delay: 6s;
+  animation-fill-mode: both;
+  transform-origin: 50% 100%;
+  transform: perspective(400px) rotateX(25deg);
+}
+
+.crawl-content {
+  text-align: center;
+  color: #FFE81F;
+  font-size: 1.2rem;
+  line-height: 1.8;
+  padding: 0 2rem;
+}
+
+@keyframes titleCrawl {
+  0% {
+    top: 100%;
+    transform: perspective(400px) rotateX(25deg);
+  }
+  100% {
+    top: -150%;
+    transform: perspective(400px) rotateX(25deg);
+  }
+}
+
+/* Epic Button Container */
+.epic-button-container {
+  margin-top: 3rem;
+  animation: fadeIn 2s ease-in;
+  animation-delay: 18s;
+  animation-fill-mode: both;
+  z-index: 100;
+  position: relative;
+}
+
+/* Epic Button Styling */
+.epic-button {
+  background: linear-gradient(45deg, #FFE81F, #FFA000, #FFE81F);
+  background-size: 200% 200%;
+  color: #000;
+  border: 2px solid #FFE81F;
+  box-shadow: 
+    0 0 20px rgba(255, 232, 31, 0.6),
+    0 0 40px rgba(255, 232, 31, 0.4),
+    0 0 60px rgba(255, 232, 31, 0.2);
+  animation: pulseGlow 2s ease-in-out infinite alternate, gradientShift 3s ease-in-out infinite;
+  position: relative;
+  z-index: 101;
+}
+
+.epic-button:hover {
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 
+    0 0 30px rgba(255, 232, 31, 0.8),
+    0 0 60px rgba(255, 232, 31, 0.6),
+    0 0 90px rgba(255, 232, 31, 0.4);
+}
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 
+      0 0 20px rgba(255, 232, 31, 0.4),
+      0 0 40px rgba(255, 232, 31, 0.2),
+      0 0 60px rgba(255, 232, 31, 0.1);
+  }
+  100% {
+    box-shadow: 
+      0 0 30px rgba(255, 232, 31, 0.8),
+      0 0 60px rgba(255, 232, 31, 0.6),
+      0 0 90px rgba(255, 232, 31, 0.4);
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* General Animation Utilities */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Animation Classes */
+.animate-fade-in-from-space {
+  animation: fadeInFromSpace 3s ease-in-out;
+}
+
+.animate-cinematic-zoom {
+  animation: cinematicZoom 4s ease-out 2s both;
+}
+
+.animate-title-crawl {
+  animation: titleCrawl 15s linear 6s both;
+}

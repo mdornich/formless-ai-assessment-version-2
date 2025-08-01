@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { SurveyState } from '@/types/survey';
 import { sendMessage } from '@/utils/api';
-import ProgressBar from './ProgressBar';
 import QuestionScreen from './QuestionScreen';
 import VoiceInputField from './VoiceInputField';
 import CompletionScreen from './CompletionScreen';
@@ -152,11 +151,6 @@ export default function SurveyInterface({ conversationId }: SurveyInterfaceProps
   // Main survey interface
   return (
     <div className="min-h-screen flex flex-col" style={{ background: 'var(--background-color)' }}>
-      {/* Progress Bar */}
-      <ProgressBar 
-        current={surveyState.questionNumber} 
-        total={surveyState.totalQuestions} 
-      />
 
       {/* Question Display */}
       <QuestionScreen 
