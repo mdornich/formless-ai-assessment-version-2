@@ -61,6 +61,13 @@ export default function VoiceInputField({
     }
   }, []);
 
+  // Re-focus when value is cleared (new question appears)
+  useEffect(() => {
+    if (!value && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [value]);
+
   const handleVoiceInput = () => {
     if (recognitionRef.current && speechSupported && !isListening) {
       setIsListening(true);
@@ -85,7 +92,7 @@ export default function VoiceInputField({
 
   return (
     <div className="w-full max-w-4xl mx-auto px-8 pb-8">
-      <div className="bg-white rounded-2xl shadow-lg p-6">
+      <div className="glass depth-medium rounded-2xl p-6">
         <div className="flex items-end space-x-4">
           {/* Text Input */}
           <div className="flex-1">
@@ -97,8 +104,9 @@ export default function VoiceInputField({
               placeholder={placeholder}
               disabled={disabled}
               rows={3}
-              className="w-full px-4 py-3 text-lg border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 resize-none disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{
+              className="input-field w-full px-4 py-3 text-lg resize-none disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ 
+                color: 'var(--font-color-primary)',
                 minHeight: '80px',
                 maxHeight: '200px',
               }}

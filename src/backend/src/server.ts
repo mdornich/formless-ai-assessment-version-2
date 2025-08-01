@@ -102,6 +102,11 @@ app.post('/api/chat', async (req, res) => {
 
   } catch (error) {
     console.error('Error in /api/chat:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
     res.status(500).json({
       error: 'Internal server error'
     });

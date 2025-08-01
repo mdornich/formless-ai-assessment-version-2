@@ -3,26 +3,39 @@
 :root {
   /* 🎨 Primary Colors */
   --primary-color: #4A90E2; /* The main brand color for buttons, links, etc. */
-  --background-color: #F7F9FC; /* The main page background */
-  --container-background: #FFFFFF; /* Background of the chat container */
-  --font-color-primary: #333333; /* Main text color */
-  --font-color-secondary: #777777; /* Lighter text for timestamps, etc. */
+  --background-color: radial-gradient(ellipse at top left, #0B557A 0%, #095270 30%, #083d5a 70%, #051e2d 100%); /* Radial gradient background */
+  --container-background: #0B557A; /* Solid container background */
+  --font-color-primary: #FFFFFF; /* Main text color */
+  --font-color-secondary: rgba(255, 255, 255, 0.8); /* Lighter text */
+
+  /* 🌟 Glassmorphism Effects */
+  --glass-background: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --glass-backdrop-blur: blur(10px);
+  
+  /* ✨ 3D Effects */
+  --depth-shadow-light: 0 4px 15px rgba(75, 144, 226, 0.2);
+  --depth-shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.3);
+  --depth-shadow-heavy: 0 15px 35px rgba(0, 0, 0, 0.4);
+  --button-shadow: 0 6px 20px rgba(75, 144, 226, 0.3);
+  --button-shadow-hover: 0 8px 25px rgba(75, 144, 226, 0.4);
 
   /* 💬 Chat Bubble Colors */
-  --agent-bubble-background: #EAECEF;
-  --agent-bubble-text: #333333;
-  --user-bubble-background: var(--primary-color);
+  --agent-bubble-background: var(--glass-background);
+  --agent-bubble-text: #FFFFFF;
+  --user-bubble-background: rgba(75, 144, 226, 0.8);
   --user-bubble-text: #FFFFFF;
 
   /* ✒️ Typography */
-  --primary-font: 'Inter', sans-serif; /* Specify a primary font family */
+  --primary-font: 'Chalkboard', sans-serif;
   --base-font-size: 16px;
 
   /* 📐 Spacing & Borders */
-  --container-max-width: 700px; /* Max width of the chat window */
-  --bubble-border-radius: 18px; /* The roundness of the chat bubbles */
-  --input-border-radius: 12px; /* The roundness of the text input field */
-  --border-color: #DDDDDD;
+  --container-max-width: 700px;
+  --bubble-border-radius: 20px;
+  --input-border-radius: 16px;
+  --border-color: var(--glass-border);
 }
 
 /* Optional: Add a placeholder for a dark mode theme */

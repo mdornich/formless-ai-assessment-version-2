@@ -5,16 +5,22 @@ import ProgressBar from './ProgressBar';
 import QuestionScreen from './QuestionScreen';
 import VoiceInputField from './VoiceInputField';
 import CompletionScreen from './CompletionScreen';
+import WelcomePage from './WelcomePage';
 
 interface SurveyInterfaceProps {
   conversationId: string;
 }
 
 export default function SurveyInterface({ conversationId }: SurveyInterfaceProps) {
+  const [showWelcome, setShowWelcome] = useState(true);
+  const [userName, setUserName] = useState('');
+  const [userCompany, setUserCompany] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  
   const [surveyState, setSurveyState] = useState<SurveyState>({
     currentQuestion: '',
     isComplete: false,
-    isLoading: true,
+    isLoading: false,
     error: null,
     questionNumber: 1,
     totalQuestions: 10, // Estimated based on question bank
@@ -22,12 +28,15 @@ export default function SurveyInterface({ conversationId }: SurveyInterfaceProps
   });
 
   const [currentAnswer, setCurrentAnswer] = useState('');
-  const [isFirstQuestion, setIsFirstQuestion] = useState(true);
 
-  // Load the first question automatically when component mounts
-  useEffect(() => {
+  const handleWelcomeStart = (name: string, company: string, email: string) => {
+    setUserName(name);
+    setUserCompany(company);
+    setUserEmail(email);
+    setShowWelcome(false);
+    // Load the first question after welcome is completed
     loadFirstQuestion();
-  }, [conversationId]);
+  };
 
   const loadFirstQuestion = async () => {
     try {
@@ -81,7 +90,6 @@ export default function SurveyInterface({ conversationId }: SurveyInterfaceProps
 
       // Clear the answer field for next question
       setCurrentAnswer('');
-      setIsFirstQuestion(false);
 
     } catch (error) {
       console.error('Error submitting answer:', error);
@@ -112,7 +120,7 @@ export default function SurveyInterface({ conversationId }: SurveyInterfaceProps
   if (surveyState.error) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="max-w-md w-full text-center bg-white rounded-2xl shadow-lg p-8">
+        <div className="glass depth-heavy max-w-md w-full text-center rounded-2xl p-8">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center">
             <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
@@ -131,6 +139,11 @@ export default function SurveyInterface({ conversationId }: SurveyInterfaceProps
     );
   }
 
+  // Show welcome page first
+  if (showWelcome) {
+    return <WelcomePage onStart={handleWelcomeStart} />;
+  }
+
   // Completion state
   if (surveyState.isComplete && surveyState.finalSummary) {
     return <CompletionScreen summary={surveyState.finalSummary} />;
@@ -138,7 +151,7 @@ export default function SurveyInterface({ conversationId }: SurveyInterfaceProps
 
   // Main survey interface
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--background-color)' }}>
+    <div className="min-h-screen flex flex-col" style={{ background: 'var(--background-color)' }}>
       {/* Progress Bar */}
       <ProgressBar 
         current={surveyState.questionNumber} 
@@ -148,7 +161,6 @@ export default function SurveyInterface({ conversationId }: SurveyInterfaceProps
       {/* Question Display */}
       <QuestionScreen 
         question={surveyState.currentQuestion}
-        isWelcome={isFirstQuestion}
       />
 
       {/* Input Field */}
@@ -169,7 +181,7 @@ export default function SurveyInterface({ conversationId }: SurveyInterfaceProps
       {/* Loading Overlay */}
       {surveyState.isLoading && surveyState.currentQuestion && (
         <div className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl shadow-lg p-6 flex items-center space-x-4">
+          <div className="glass depth-medium rounded-2xl p-6 flex items-center space-x-4">
             <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
             <span className="text-lg">Processing your response...</span>
           </div>

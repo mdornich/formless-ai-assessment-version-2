@@ -28,6 +28,11 @@ export class AIService {
       return parsedResponse;
     } catch (error) {
       console.error('Error generating AI response:', error);
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
       // Return a fallback response
       return {
         next_question: "I apologize, but I'm experiencing technical difficulties. Could you please repeat your last response?",

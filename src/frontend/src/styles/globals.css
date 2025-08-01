@@ -5,41 +5,98 @@
 
 /* Apply theme variables globally */
 body {
-  background-color: var(--background-color);
+  background: var(--background-color);
   font-family: var(--primary-font);
   color: var(--font-color-primary);
   font-size: var(--base-font-size);
+  min-height: 100vh;
 }
 
-/* Custom component styles using theme variables */
+/* Glassmorphism base class */
+.glass {
+  background: var(--glass-background);
+  backdrop-filter: var(--glass-backdrop-blur);
+  -webkit-backdrop-filter: var(--glass-backdrop-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+/* 3D depth effects */
+.depth-light {
+  box-shadow: var(--depth-shadow-light);
+}
+
+.depth-medium {
+  box-shadow: var(--depth-shadow-medium);
+}
+
+.depth-heavy {
+  box-shadow: var(--depth-shadow-heavy);
+}
+
+/* Survey container with glassmorphism */
 .survey-container {
-  background-color: var(--container-background);
+  background: var(--glass-background);
+  backdrop-filter: var(--glass-backdrop-blur);
+  -webkit-backdrop-filter: var(--glass-backdrop-blur);
   max-width: var(--container-max-width);
-  border: 1px solid var(--border-color);
-}
-
-.question-container {
-  background-color: var(--container-background);
-  padding: 2rem;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--depth-shadow-medium);
   border-radius: var(--bubble-border-radius);
 }
 
-.input-field {
-  border-radius: var(--input-border-radius);
-  border: 1px solid var(--border-color);
+/* Question container - floating text on background */
+.question-container {
+  background: transparent;
+  padding: 3rem;
 }
 
+/* Enhanced button styling */
 .primary-button {
-  background-color: var(--primary-color);
+  background: var(--primary-color);
   color: var(--user-bubble-text);
   border-radius: var(--input-border-radius);
+  box-shadow: 0 4px 15px rgba(75, 144, 226, 0.4);
+  transition: all 0.2s ease;
+  border: 2px solid var(--primary-color);
+  font-weight: 700;
+  text-shadow: none;
+  filter: none;
+  z-index: 10;
+  position: relative;
 }
 
 .primary-button:hover {
-  opacity: 0.9;
+  background: #5ba0f2;
+  border-color: #5ba0f2;
+  box-shadow: 0 6px 20px rgba(91, 160, 242, 0.5);
+  transform: translateY(-1px);
+}
+
+.primary-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(75, 144, 226, 0.3);
 }
 
 .primary-button:disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
+  transform: none;
+  filter: none;
+}
+
+/* Welcome page specific styles */
+.welcome-container {
+  background: var(--glass-background);
+  backdrop-filter: var(--glass-backdrop-blur);
+  -webkit-backdrop-filter: var(--glass-backdrop-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--depth-shadow-heavy);
+  border-radius: var(--bubble-border-radius);
+  transition: all 0.4s ease;
+}
+
+.welcome-container:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
 }
