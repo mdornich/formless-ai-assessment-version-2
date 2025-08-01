@@ -52,19 +52,19 @@ export default function WelcomeIntro({ onNext }: WelcomeIntroProps) {
           <div className="crawl-container">
             <div className="crawl-text">
               <div className="crawl-content">
-                <p className="text-xl md:text-2xl font-semibold mb-6">
+                <p className="text-2xl md:text-3xl font-semibold mb-6">
                   🚀 Welcome to Your AI Assessment!
                 </p>
                 
-                <p className="text-lg md:text-xl leading-relaxed mb-4">
+                <p className="text-xl md:text-2xl leading-relaxed mb-4">
                   We're going to ask you 10 questions in order to better assess your current AI experience and expectations.
                 </p>
                 
-                <p className="text-lg md:text-xl leading-relaxed mb-4">
+                <p className="text-xl md:text-2xl leading-relaxed mb-4">
                   Once you complete it, we'll email you the report.
                 </p>
                 
-                <p className="text-lg md:text-xl font-semibold mb-6" style={{ color: '#DBB176' }}>
+                <p className="text-xl md:text-2xl font-semibold mb-6" style={{ color: '#DBB176' }}>
                   ✨ You might be surprised how much insight we can share back with just these questions! ✨
                 </p>
 
