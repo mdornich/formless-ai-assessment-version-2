@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import SurveyInterface from '@/components/SurveyInterface';
+import StarField from '@/components/StarField';
 
 export default function Assessment() {
   const router = useRouter();
@@ -36,6 +37,7 @@ export default function Assessment() {
           <meta name="viewport" content="width=device-width, initial-scale=1" />
         </Head>
         <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--background-color)' }}>
+          <StarField />
           <div className="text-center">
             <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
             <p className="text-xl">Preparing your assessment...</p>
@@ -53,6 +55,7 @@ export default function Assessment() {
           <meta name="viewport" content="width=device-width, initial-scale=1" />
         </Head>
         <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: 'var(--background-color)' }}>
+          <StarField />
           <div className="max-w-md w-full text-center bg-white rounded-2xl shadow-lg p-8">
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center">
               <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

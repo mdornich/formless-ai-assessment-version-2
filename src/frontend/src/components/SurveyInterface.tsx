@@ -5,6 +5,7 @@ import QuestionScreen from './QuestionScreen';
 import VoiceInputField from './VoiceInputField';
 import CompletionScreen from './CompletionScreen';
 import WelcomePage from './WelcomePage';
+import StarField from './StarField';
 
 interface SurveyInterfaceProps {
   conversationId: string;
@@ -25,6 +26,15 @@ export default function SurveyInterface({ conversationId }: SurveyInterfaceProps
     totalQuestions: 10, // Estimated based on question bank
     finalSummary: '',
   });
+
+  // Debug surveyState changes
+  useEffect(() => {
+    console.log('🔍 SurveyState changed:', { 
+      isLoading: surveyState.isLoading, 
+      currentQuestion: surveyState.currentQuestion ? 'has question' : 'no question',
+      error: surveyState.error 
+    });
+  }, [surveyState]);
 
   const [currentAnswer, setCurrentAnswer] = useState('');
 
@@ -104,6 +114,7 @@ export default function SurveyInterface({ conversationId }: SurveyInterfaceProps
   if (surveyState.isLoading && !surveyState.currentQuestion) {
     return (
       <div className="min-h-screen flex items-center justify-center">
+        <StarField />
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-xl">Loading your assessment...</p>
@@ -119,6 +130,7 @@ export default function SurveyInterface({ conversationId }: SurveyInterfaceProps
   if (surveyState.error) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
+        <StarField />
         <div className="glass depth-heavy max-w-md w-full text-center rounded-2xl p-8">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center">
             <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -151,6 +163,7 @@ export default function SurveyInterface({ conversationId }: SurveyInterfaceProps
   // Main survey interface
   return (
     <div className="min-h-screen flex flex-col" style={{ background: 'var(--background-color)' }}>
+      <StarField />
 
       {/* Question Display */}
       <QuestionScreen 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import QuestionScreen from './QuestionScreen';
 import VoiceInputField from './VoiceInputField';
+import StarField from './StarField';
 
 interface WelcomeQuestionsProps {
   onComplete: (name: string, company: string, email: string) => void;
@@ -35,24 +36,28 @@ export default function WelcomeQuestions({ onComplete }: WelcomeQuestionsProps) 
 
     setTimeout(() => {
       if (currentStep === 'name') {
-        setName(inputValue.trim());
+        const newName = inputValue.trim();
+        setName(newName);
         setInputValue('');
         setCurrentStep('company');
       } else if (currentStep === 'company') {
-        setCompany(inputValue.trim());
+        const newCompany = inputValue.trim();
+        setCompany(newCompany);
         setInputValue('');
         setCurrentStep('email');
       } else if (currentStep === 'email') {
         // Basic email validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(inputValue.trim())) {
+        const newEmail = inputValue.trim();
+        if (!emailRegex.test(newEmail)) {
           setIsSubmitting(false);
           // Could add error handling here
           return;
         }
         
-        setEmail(inputValue.trim());
-        onComplete(name, company, inputValue.trim());
+        setEmail(newEmail);
+        console.log('Completing assessment with:', { name, company, email: newEmail });
+        onComplete(name, company, newEmail);
       }
       
       setIsSubmitting(false);
@@ -69,10 +74,14 @@ export default function WelcomeQuestions({ onComplete }: WelcomeQuestionsProps) 
   };
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: 'var(--background-color)' }}>
+    <div className="min-h-screen flex flex-col relative overflow-hidden" style={{ background: 'var(--background-color)' }}>
+      {/* Star Field Background */}
+      <StarField />
       
-      {/* Question Display */}
-      <QuestionScreen question={questions[currentStep]} />
+      {/* Content with z-index to appear above stars */}
+      <div className="relative z-10 flex flex-col flex-1">
+        {/* Question Display */}
+        <QuestionScreen question={questions[currentStep]} />
       
       {/* Input Field */}
       <VoiceInputField
@@ -84,15 +93,6 @@ export default function WelcomeQuestions({ onComplete }: WelcomeQuestionsProps) 
         onKeyPress={handleKeyPress}
       />
 
-      {/* Progress indicator */}
-      <div className="px-8 pb-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-sm" style={{ color: 'var(--font-color-secondary)' }}>
-            {currentStep === 'name' && "Step 1 of 3"}
-            {currentStep === 'company' && "Step 2 of 3"}
-            {currentStep === 'email' && "Step 3 of 3 • We'll send your report here! 📊"}
-          </p>
-        </div>
       </div>
     </div>
   );
