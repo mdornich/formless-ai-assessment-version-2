@@ -29,6 +29,8 @@ export default function VoiceInputField({
   const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
+    console.log('🔍 VoiceInputField mounted - value:', value, 'disabled:', disabled);
+    
     // Check if speech recognition is supported
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     setSpeechSupported(!!SpeechRecognition);
@@ -58,15 +60,18 @@ export default function VoiceInputField({
     // Focus the textarea when component mounts
     if (textareaRef.current) {
       textareaRef.current.focus();
+      console.log('🎯 Textarea focused on mount');
     }
   }, []);
 
   // Re-focus when value is cleared (new question appears)
   useEffect(() => {
+    console.log('🔄 Value changed - value:', JSON.stringify(value), 'disabled:', disabled);
     if (!value && textareaRef.current) {
       textareaRef.current.focus();
+      console.log('🎯 Textarea re-focused on value clear');
     }
-  }, [value]);
+  }, [value, disabled]);
 
   const handleVoiceInput = () => {
     if (recognitionRef.current && speechSupported && !isListening) {
@@ -91,24 +96,36 @@ export default function VoiceInputField({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-8 pb-8">
-      <div className="glass depth-medium rounded-2xl p-6">
+    <div className="w-full max-w-4xl mx-auto px-8 pb-8" style={{ position: 'relative', zIndex: 50 }}>
+      <div className="glass depth-medium rounded-2xl p-6" style={{ position: 'relative', zIndex: 60 }}>
         <div className="flex items-end space-x-4">
           {/* Text Input */}
           <div className="flex-1">
             <textarea
               ref={textareaRef}
               value={value}
-              onChange={(e) => onChange(e.target.value)}
+              onChange={(e) => {
+                console.log('⌨️ onChange fired - e.target.value:', JSON.stringify(e.target.value));
+                onChange(e.target.value);
+              }}
               onKeyPress={handleKeyPress}
+              onFocus={() => console.log('🎯 Textarea focused')}
+              onBlur={() => console.log('🎯 Textarea blurred')}
+              onClick={() => console.log('🖱️ Textarea clicked')}
               placeholder={placeholder}
               disabled={disabled}
               rows={3}
-              className="input-field w-full px-4 py-3 text-lg resize-none disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-4 py-3 text-lg resize-none disabled:opacity-50 disabled:cursor-not-allowed rounded-lg border border-gray-300"
               style={{ 
-                color: 'var(--font-color-primary)',
+                color: '#333333',
+                backgroundColor: '#FFFFFF',
                 minHeight: '80px',
                 maxHeight: '200px',
+                fontSize: '18px',
+                fontFamily: 'inherit',
+                position: 'relative',
+                zIndex: 100,
+                pointerEvents: 'auto',
               }}
             />
           </div>

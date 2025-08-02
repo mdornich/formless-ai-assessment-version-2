@@ -113,6 +113,36 @@ export class DatabaseService {
       console.error('Error creating assessment:', error);
     }
   }
+
+  async createConversation(conversationId: string, assessmentType: string = 'ai-readiness'): Promise<Conversation | null> {
+    try {
+      const { data, error } = await supabase
+        .from('conversations')
+        .insert({
+          id: conversationId,
+          assessment_type: assessmentType,
+          status: 'in_progress',
+          current_step: 0,
+          instruction_id: null, // Allow null for demo purposes
+          user_id: null // Allow null for demo purposes
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating conversation - Full error:', JSON.stringify(error, null, 2));
+        console.error('Error message:', error.message);
+        console.error('Error details:', error.details);
+        console.error('Error hint:', error.hint);
+        return null;
+      }
+
+      return data;
+    } catch (err) {
+      console.error('Exception creating conversation:', err);
+      return null;
+    }
+  }
 }
 
 export const databaseService = new DatabaseService();

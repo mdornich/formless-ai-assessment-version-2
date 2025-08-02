@@ -1,4 +1,5 @@
 import React from 'react';
+import StarField from './StarField';
 
 interface CompletionScreenProps {
   summary: string;
@@ -6,8 +7,12 @@ interface CompletionScreenProps {
 
 export default function CompletionScreen({ summary }: CompletionScreenProps) {
   return (
-    <div className="min-h-screen flex items-center justify-center px-8 py-16" style={{ backgroundColor: 'var(--background-color)' }}>
-      <div className="max-w-4xl w-full text-center">
+    <div className="min-h-screen flex items-center justify-center px-8 py-16 relative overflow-hidden" style={{ backgroundColor: 'var(--background-color)' }}>
+      {/* Star Field Background */}
+      <StarField />
+      
+      {/* Content with z-index to appear above stars */}
+      <div className="relative z-10 max-w-4xl w-full text-center">
         {/* Success Icon */}
         <div className="mb-8">
           <div className="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--primary-color)' }}>
@@ -33,7 +38,7 @@ export default function CompletionScreen({ summary }: CompletionScreenProps) {
             Your AI Competency Profile
           </h2>
           <div className="prose prose-lg max-w-none">
-            <p className="text-lg leading-relaxed whitespace-pre-wrap">
+            <p className="text-lg leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--primary-color)' }}>
               {summary}
             </p>
           </div>

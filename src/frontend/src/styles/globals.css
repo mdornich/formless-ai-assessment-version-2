@@ -212,10 +212,15 @@ body {
 /* Opening Crawl Container */
 .crawl-container {
   perspective: 400px;
-  height: 400px;
+  height: 100vh;
   overflow: hidden;
-  margin: 2rem 0;
-  position: relative;
+  margin: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Remove gradient mask to show complete text */
 }
 
 .crawl-text {
@@ -233,21 +238,34 @@ body {
 .crawl-content {
   text-align: center;
   color: #FFE81F;
-  font-size: 1.2rem;
+  font-size: 1.59rem;
   line-height: 1.8;
   padding: 0 2rem;
 }
 
-@keyframes titleCrawl {
+@keyframes titleCrawlHold {
   0% {
-    top: 100%;
+    top: 150%; /* Start completely off-screen at bottom */
     transform: perspective(400px) rotateX(25deg);
   }
   100% {
-    top: -150%;
+    top: 10%; /* Stop just below AI ASSESSMENT title */
     transform: perspective(400px) rotateX(25deg);
   }
 }
+
+.crawl-text {
+  position: absolute;
+  top: 150%;
+  left: 0;
+  right: 0;
+  animation: titleCrawlHold 12s ease-out;
+  animation-delay: 6s;
+  animation-fill-mode: forwards;
+  transform-origin: 50% 100%;
+  transform: perspective(400px) rotateX(25deg);
+}
+
 
 /* Epic Button Container */
 .epic-button-container {
