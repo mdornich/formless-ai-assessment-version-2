@@ -42,6 +42,7 @@ export default function WelcomeIntro({ onNext }: WelcomeIntroProps) {
           </div>
         </div>
 
+
         {/* Middle Section - Opening Crawl Text - Now absolute positioned */}
         <div className="crawl-container">
           <div className="max-w-6xl w-full text-center mx-auto">
@@ -62,6 +63,7 @@ export default function WelcomeIntro({ onNext }: WelcomeIntroProps) {
                   <p className="text-4xl md:text-5xl font-semibold mb-12" style={{ color: '#FFA000' }}>
                     ✨ You might be surprised how much insight we can share back with just these questions! ✨
                   </p>
+
 
                   <p className="text-4xl md:text-5xl leading-relaxed">
                     Ready to discover your AI superpower? Let's dive in!
